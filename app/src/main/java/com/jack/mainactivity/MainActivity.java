@@ -1,7 +1,10 @@
 package com.jack.mainactivity;
 
 import android.Manifest;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
@@ -16,11 +19,14 @@ import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -78,9 +84,16 @@ public class MainActivity extends AppCompatActivity {
         textureView = (TextureView) findViewById(R.id.texture);
         assert textureView != null;
         textureView.setSurfaceTextureListener(textureListener);
-        //takePictureButton = (Button) findViewById(R.id.btn_takepicture);
+        takePictureButton = (Button) findViewById(R.id.btn_takepicture);
         assert takePictureButton != null;
         contador = (TextView)findViewById(R.id.txt_time);
+
+
+
+
+
+
+
 
         new CountDownTimer(5000, 1000) {
 
@@ -97,12 +110,21 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-   /*     takePictureButton.setOnClickListener(new View.OnClickListener() {
+       takePictureButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                takePicture();
+            //    takePicture();
+
+                int time = 5;
+
+                Intent intent = new Intent(MainActivity.this,Alarm.class);
+                PendingIntent pi = PendingIntent.getBroadcast(getApplicationContext(),0,intent,0);
+                AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+                alarmManager.set(AlarmManager.RTC_WAKEUP,System.currentTimeMillis()+time*1000,pi);
+
+
             }
-        }); */
+        });
     }
 
     TextureView.SurfaceTextureListener textureListener = new TextureView.SurfaceTextureListener() {
@@ -201,6 +223,7 @@ public class MainActivity extends AppCompatActivity {
             int rotation = getWindowManager().getDefaultDisplay().getRotation();
             captureBuilder.set(CaptureRequest.JPEG_ORIENTATION, ORIENTATIONS.get(rotation));
             final File file = new File(Environment.getExternalStorageDirectory() + "/pic.jpg");
+
             ImageReader.OnImageAvailableListener readerListener = new ImageReader.OnImageAvailableListener() {
                 @Override
                 public void onImageAvailable(ImageReader reader) {
